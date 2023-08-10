@@ -5,7 +5,7 @@ O documento apresenta a análise de previsão do fechamento do índice Ibovespa 
 
 # Aplicativo
 O Aplicativo em sí pode ser acessado pelo link abaixo:  
-https://tinyurl.com/tech-challenge
+[https://tinyurl.com/tech-challenge-ml](https://tinyurl.com/tech-challenge-ml)
 
 # Arquivo Notebook
 Juntamente com a aplicação, está disposto o arquivo notebook com todo o processo utilizado para a criação dos DataFrames e gráficos apresentados na aplicação.
