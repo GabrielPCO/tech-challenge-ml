@@ -72,9 +72,9 @@ with tab0:
 
     Links dos integrantes do projeto:
 
-    [github.com/GabrielPCO](https://github.com/GabrielPCO/tech_challenge) - Github Gabriel Oliveira
+    [github.com/GabrielPCO](https://github.com/GabrielPCO/tech-challenge-ml) - Github Gabriel Oliveira
 
-    [github.com/jackson-simionato](https://github.com/jackson-simionato/fase1_pos_tech_challenge_wine) - Github Jackson Simionato
+    [github.com/jackson-simionato](https://github.com/jackson-simionato) - Github Jackson Simionato
 
     gabrielpcoliveira@gmail.com - Email Gabriel Oliveira
 
@@ -99,7 +99,7 @@ with tab0:
     
     Neste documento iremos analizar dados históricos do fechamento do índice Ibovespa e criar um modelo preditivo com intuito de evidenciar padrões e tendências futuras dentro de um intervalo apropriado de confiânça.
 
-    Os tópicos foram divididos em cinco categorias: Análise dos dados, Visualização dos Dados, ADF, ARIMA e previsão. Cada categoria será tratada e mais aprofundada em sua respectiva aba dentro desse documento.
+    Os tópicos foram divididos em cinco categorias: análise dos dados, visualização dos dados, ADF, ARIMA e previsão. Cada categoria será tratada e mais aprofundada em sua respectiva aba dentro desse documento.
 
     
     A seguir, disponibilizamos os dados utilizados para a análise no momento da publicação deste documento.
@@ -313,7 +313,7 @@ with tab2:
 
     ## Visualização dos Dados
 
-    Inicialmente iremos visualizar o fechamento diário do Ibovespa no período entre 27-12-2000 a 11-03-2021
+    Inicialmente iremos visualizar o fechamento diário do Ibovespa no período entre 27/12/2000 a 11/03/2021
     '''
     graf_1 = load_img('Assets/Graficos/historico.jpg')
     st.image(graf_1)
