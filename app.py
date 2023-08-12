@@ -52,8 +52,8 @@ def load_img(img):
 
 # Layout do aplicativo
 tab0, tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["🔷Introdução",
-                                                    "🌐Análise dos Dados",
-                                                    "🔍Visualização dos Dados",
+                                                    "🌐Base de Dados",
+                                                    "🔍Visualização",
                                                     "📝ADF", 
                                                     "📊ARIMA",
                                                     "📈Previsão",
@@ -95,11 +95,10 @@ with tab0:
     Reavaliado a cada quatro meses, o índice é resultado de uma carteira teórica de ativos. 
     
     Composto pelas ações e units de companhias listadas na B3 que atendem aos critérios descritos na sua metodologia, correspondendo a cerca de 80% do número de negócios e do volume financeiro do nosso mercado de capitais.
-
     
-    Neste documento iremos analizar dados históricos do fechamento do índice Ibovespa e criar um modelo preditivo com intuito de evidenciar padrões e tendências futuras dentro de um intervalo apropriado de confiânça.
+    Neste documento iremos analizar dados históricos do fechamento do índice Ibovespa e criar um modelo preditivo com intuito de evidenciar padrões e tendências futuras dentro de um intervalo apropriado de confiança.
 
-    Os tópicos foram divididos em cinco categorias: análise dos dados, visualização dos dados, ADF, ARIMA e previsão. Cada categoria será tratada e mais aprofundada em sua respectiva aba dentro desse documento.
+    Os tópicos foram divididos em cinco categorias: base de dados, visualização, ADF, ARIMA e previsão. Cada categoria será tratada e mais aprofundada em sua respectiva aba dentro desse documento.
 
     
     A seguir, disponibilizamos os dados utilizados para a análise no momento da publicação deste documento.
@@ -147,11 +146,13 @@ with tab0:
 with tab1:
     '''
 
-    ## Análise dos dados
+    ## Coleta e Manipulação dos dados
 
     Inicialmente, realizamos o carregamento dos dados utilizados na análise.
 
-    Esses dados contem o histórico de fechamento do índice Ibovespa durante o período de 27/12/2000 a 11/03/2021
+    Esses dados contem o histórico de fechamento do índice Ibovespa durante o período de 27/12/2000 a 11/03/2021.
+
+    Os dados foram obtidos do site da investing.com que é uma plataforma e site de notícias sobre o mercado financeiro.
     ```python
     # Carregando o DataFrame com os dados da base
     df_ibovespa = pd.read_csv('Assets/Base/ibovespa.csv', sep=',')
@@ -461,20 +462,20 @@ with tab4:
     Ela retorna um modelo ARIMA ajustado após determinar os parâmetros mais ideais de p, q e d.
 
     ```python
-    model_autoARIMA = auto_arima(train_data.sort_index(), start_p=0, start_q=0,
-                      test='adf',       # use adftest to find optimal 'd'
-                      max_p=5, max_q=5, # maximum p and q
-                      m=1,              # frequency of series
-                      d=None,           # let model determine 'd'
-                      seasonal=False,   # No Seasonality
-                      start_P=0, 
-                      D=0, 
-                      trace=True,
-                      error_action='ignore',  
-                      suppress_warnings=True, 
-                      stepwise=True)
-    print(model_autoARIMA.summary())
-    model_autoARIMA.plot_diagnostics(figsize=(15,8))
+        arima_fit = auto_arima(train_data.sort_index(), start_p=0, start_q=0,
+                        test='adf',       # usa o teste adf para achar o 'd' otimizado
+                        max_p=5, max_q=5, # máximo p e q
+                        m=1,              # frequência da série
+                        d=None,           # deixa o modelo decidir o 'd'
+                        seasonal=False,   # Sem sazonalidade
+                        start_P=0, 
+                        D=0, 
+                        trace=True,
+                        error_action='ignore',  
+                        suppress_warnings=True, 
+                        stepwise=True)
+    print(arima_fit.summary())
+    arima_fit.plot_diagnostics(figsize=(15,8))
     plt.show()
     ```
     ```
@@ -527,7 +528,7 @@ with tab5:
     Utilizaremos a função 'predict' do statsmodel para a previsão dos dados.
     ```python
     # Fazendo a previsão com os dados ajustados
-    prediction, confint = model_autoARIMA.predict(len(test_data), return_conf_int=True,alpha=0.05)
+    prediction, confint = arima_fit.predict(len(test_data), return_conf_int=True,alpha=0.05)
     ```
 
     Em seguida, vamos plotar o gráfico com a previsão e os intervalos de confiança.
@@ -600,5 +601,7 @@ with tab6:
     3. SMITH, Taylor G. Forecasting the stock market with pmdarima. alkaline-ml, 2019. Disponível em: https://alkaline-ml.com/2019-12-18-pmdarima-1-5-2/. Acessado em: 10, agosto de 2023.
 
     4. Índice Bovespa (Ibovespa B3). B3, 2023. Disponível em: https://www.b3.com.br/pt_br/market-data-e-indices/indices/indices-amplos/ibovespa.htm. Acessado em: 10, agosto de 2023.
+
+    5. Dados Históricos - Ibovespa. Investing.com, 2023. Disponível em: https://br.investing.com/indices/bovespa-historical-data. Acessado em: Acessado em: 10, agosto de 2023.
     '''
 
