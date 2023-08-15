@@ -107,7 +107,7 @@ with tab0:
     st.divider()
     '''
 
-    #### DataFrame dos dados do histórico de fechamento do Ibovespa entre os anos de 2000 a 2021
+    #### DataFrame dos dados do histórico de fechamento do Ibovespa entre os anos de 2003 a 2023
     '''
 
     # Função do botão de Download para converter o DataFrame em .csv
@@ -150,7 +150,7 @@ with tab1:
 
     Inicialmente, realizamos o carregamento dos dados utilizados na análise.
 
-    Esses dados contem o histórico de fechamento do índice Ibovespa durante o período de 27/12/2000 a 11/03/2021.
+    Esses dados contem o histórico de fechamento do índice Ibovespa durante o período de 15/10/2003 a 15/08/2023.
 
     Os dados foram obtidos do site da investing.com que é uma plataforma e site de notícias sobre o mercado financeiro.
     ```python
@@ -216,7 +216,7 @@ with tab1:
     df_ibovespa.shape
     ```
     ```
-    (4999, 7)
+    (4912, 7)
     ```
     E as principais informações dos nossos dados
     ```python
@@ -225,19 +225,19 @@ with tab1:
     ```
     ```
     <class 'pandas.core.frame.DataFrame'>
-    RangeIndex: 4999 entries, 0 to 4998
+    RangeIndex: 4912 entries, 0 to 4911
     Data columns (total 7 columns):
     #   Column    Non-Null Count  Dtype  
     ---  ------    --------------  -----  
-    0   Data      4999 non-null   object 
-    1   Último    4999 non-null   float64
-    2   Abertura  4999 non-null   float64
-    3   Máxima    4999 non-null   float64
-    4   Mínima    4999 non-null   float64
-    5   Vol.      4998 non-null   object 
-    6   Var%      4999 non-null   object 
+    0   Data      4912 non-null   object 
+    1   Último    4912 non-null   float64
+    2   Abertura  4912 non-null   float64
+    3   Máxima    4912 non-null   float64
+    4   Mínima    4912 non-null   float64
+    5   Vol.      4911 non-null   object 
+    6   Var%      4912 non-null   object 
     dtypes: float64(4), object(3)
-    memory usage: 273.5+ KB
+    memory usage: 268.8+ KB
     ```
     '''
     st.divider()
@@ -255,11 +255,11 @@ with tab1:
     ```
     ```
     |       Data |  Último | Abertura |  Máxima |  Mínima |   Vol. |   Var% |
-    | 2021-03-11 | 114.984 |  112.782 | 115.127 | 112.776 | 12,09M |  1,96% |
-    | 2021-03-10 | 112.776 |  111.331 | 112.928 | 109.999 | 12,51M |  1,30% |
-    | 2021-03-09 | 111.331 |  110.611 | 112.525 | 109.343 | 12,14M |  0,65% |
-    | 2021-03-08 | 110.612 |  115.202 | 115.202 | 110.268 | 13,70M | -3,98% |
-    | 2021-03-05 | 115.202 |  112.690 | 115.504 | 112.504 | 13,25M |  2,23% |
+    | 2023-08-15 | 116.552 | 116.809  | 117.697 | 116.238 | 11,79M | -0,22% |
+    | 2023-08-14 | 116.810 | 118.067  | 118.082 | 116.530 | 11,20M | -1,06% |
+    | 2023-08-11 | 118.065 | 118.350  | 119.054 | 117.415 | 11,87M | -0,24% |
+    | 2023-08-10 | 118.350 | 118.412  | 119.438 | 118.113 | 12,69M | -0,05% |
+    | 2023-08-09 | 118.409 | 119.090  | 119.090 | 117.901 | 11,25M | -0,57% |
     ```
     '''
     st.divider()
@@ -284,11 +284,11 @@ with tab1:
     ```
     ```
     |       Data | Último | Abertura | Máxima | Mínima |   Vol. |   Var% |
-    | 2021-03-11 | 114984 |   112782 | 115127 | 112776 | 12,09M |  1,96% |
-    | 2021-03-10 | 112776 |   111331 | 112928 | 109999 | 12,51M |  1,30% |
-    | 2021-03-09 | 111331 |   110611 | 112525 | 109343 | 12,14M |  0,65% |
-    | 2021-03-08 | 110612 |   115202 | 115202 | 110268 | 13,70M | -3,98% |
-    | 2021-03-05 | 115202 |   112690 | 115504 | 112504 | 13,25M |  2,23% |
+    | 2023-08-15 | 116552 | 116809   | 117697 | 116238 | 11,79M | -0,22% |
+    | 2023-08-14 | 116810 | 118067   | 118082 | 116530 | 11,20M | -1,06% |
+    | 2023-08-11 | 118065 | 118350   | 119054 | 117415 | 11,87M | -0,24% |
+    | 2023-08-10 | 118350 | 118412   | 119438 | 118113 | 12,69M | -0,05% |
+    | 2023-08-09 | 118409 | 119090   | 119090 | 117901 | 11,25M | -0,57% |
     ```
     '''
     st.divider()
@@ -314,7 +314,7 @@ with tab2:
 
     ## Visualização dos Dados
 
-    Inicialmente iremos visualizar o fechamento diário do Ibovespa no período entre 27/12/2000 a 11/03/2021
+    Inicialmente iremos visualizar o fechamento diário do Ibovespa no período entre 15/10/2003 a 15/08/2023
     '''
     graf_1 = load_img('Assets/Graficos/historico.jpg')
     st.image(graf_1)
@@ -407,13 +407,13 @@ with tab3:
     ```
     ```
     Resultados do teste Dickey Fuller:
-    Estatística de Teste                  -0.935776
-    p-valor                                0.775963
-    Lags utilizados                       18.000000
-    Número de observações utilizadas    4980.000000
-    Valor crítico (1%)                    -3.431664
-    Valor crítico (5%)                    -2.862121
-    Valor crítico (10%)                   -2.567079
+    Estatística de Teste                  -0.178197
+    p-valor                                0.941071
+    Lags utilizados                        6.000000
+    Número de observações utilizadas    4905.000000
+    Valor crítico (1%)                    -3.431684
+    Valor crítico (5%)                    -2.862129
+    Valor crítico (10%)                   -2.567084
     dtype: float64
     ```
 
@@ -445,6 +445,12 @@ with tab3:
     ## Separando Treino e Teste
 
     Agora vamos desenvolver um modelo ARIMA e treiná-lo usando o preço de fechamento da ação a partir dos dados do treino. Então, vamos visualizar os dados dividindo-os em conjuntos de treinamento e teste.
+    
+    Decidimos dividir treinamento e teste em 80% e 20% dos dados, respectivamente.
+    ```python
+    train_len = int(df_ibovespa_indexData_log.shape[0]*0.8)
+    train_data, test_data = train_test_split(df_ibovespa_indexData_log.sort_index(),train_size=train_len)
+    ```
     '''
     graf_7 = load_img('Assets/Graficos/treino_teste.jpg')
     st.image(graf_7)
@@ -480,30 +486,30 @@ with tab4:
     ```
     ```
     Performing stepwise search to minimize aic
-    ARIMA(0,1,0)(0,0,0)[0] intercept   : AIC=-23362.757, Time=0.14 sec
-    ARIMA(1,1,0)(0,0,0)[0] intercept   : AIC=-23360.757, Time=0.21 sec
-    ARIMA(0,1,1)(0,0,0)[0] intercept   : AIC=-23360.757, Time=0.46 sec
-    ARIMA(0,1,0)(0,0,0)[0]             : AIC=-23362.517, Time=0.09 sec
-    ARIMA(1,1,1)(0,0,0)[0] intercept   : AIC=-23358.756, Time=0.68 sec
+    ARIMA(0,1,0)(0,0,0)[0] intercept   : AIC=-20868.132, Time=0.14 sec
+    ARIMA(1,1,0)(0,0,0)[0] intercept   : AIC=-20866.387, Time=0.16 sec
+    ARIMA(0,1,1)(0,0,0)[0] intercept   : AIC=-20866.399, Time=0.32 sec
+    ARIMA(0,1,0)(0,0,0)[0]             : AIC=-20867.508, Time=0.08 sec
+    ARIMA(1,1,1)(0,0,0)[0] intercept   : AIC=-20864.132, Time=0.39 sec
 
     Best model:  ARIMA(0,1,0)(0,0,0)[0] intercept
-    Total fit time: 1.596 seconds
+    Total fit time: 1.094 seconds
                                 SARIMAX Results                                
     ==============================================================================
-    Dep. Variable:                      y   No. Observations:                 4456
-    Model:               SARIMAX(0, 1, 0)   Log Likelihood               11683.378
-    Date:                Wed, 09 Aug 2023   AIC                         -23362.757
-    Time:                        20:25:15   BIC                         -23349.953
-    Sample:                             0   HQIC                        -23358.243
-                                - 4456                                         
+    Dep. Variable:                      y   No. Observations:                 3929
+    Model:               SARIMAX(0, 1, 0)   Log Likelihood               10436.066
+    Date:                Tue, 15 Aug 2023   AIC                         -20868.132
+    Time:                        16:51:36   BIC                         -20855.581
+    Sample:                             0   HQIC                        -20863.679
+                                - 3929                                         
     Covariance Type:                  opg                                         
     ==============================================================================
                     coef    std err          z      P>|z|      [0.025      0.975]
     ------------------------------------------------------------------------------
-    intercept      0.0004      0.000      1.495      0.135      -0.000       0.001
-    sigma2         0.0003   3.71e-06     83.279      0.000       0.000       0.000
+    intercept      0.0004      0.000      1.620      0.105   -9.22e-05       0.001
+    sigma2         0.0003   3.46e-06     83.415      0.000       0.000       0.000
     ===================================================================================
-    Ljung-Box (L1) (Q):                   0.00   Jarque-Bera (JB):              3347.36
+    Ljung-Box (L1) (Q):                   0.25   Jarque-Bera (JB):              4246.78
     ...
     ===================================================================================
     ```
@@ -573,12 +579,12 @@ with tab5:
     print('MAPE: '+str(mape))
     ```
     ```
-    MSE: 0.02181087715550632
-    MAE: 0.1198479963216483
-    RMSE: 0.1476850607052261
-    MAPE: 0.010402870717903233
+    MSE: 0.040290750459765705
+    MAE: 0.16540199812023165
+    RMSE: 0.20072556005592737
+    MAPE: 0.014319964423499875
     ```
-    Com um MAPE de aproximadamente 1,0% o modelo tem 99% de acurácia para prever alguma das próximas observações
+    Com um MAPE de aproximadamente 1,4% o modelo tem 98,6% de acurácia para prever as próximas observações dentro do intervalo de confiânça
     '''
     st.divider()
     '''
@@ -587,21 +593,21 @@ with tab5:
 
     Após organizar, modificar e ajustar os dados de fechamento através do modelo de previsão ARIMA, fomos capazes de prever os dados de teste com uma alta taxa de confiança.
     
-    Provavelmente, o modelo em questão seria capaz de prever alguma das próximas observações com acurácia dentro dos limites de confiânça.
+    Provavelmente, o modelo em questão seria capaz de prever alguma das próximas observações com acurácia, dentro dos limites de confiânça.
     '''
 with tab6:
     '''
 
     ## Referências
 
-    1. DHADUK, Hardikkumar. Stock market forecasting using Time Series analysis With ARIMA model. Analytics Vidhya, 2021. Disponível em: https://www.analyticsvidhya.com/blog/2021/07/stock-market-forecasting-using-time-series-analysis-with-arima-model/. Acesso em: 10, agosto de 2023.
+    1. DHADUK, Hardikkumar. Stock market forecasting using Time Series analysis With ARIMA model. Analytics Vidhya, 2021. Disponível em: https://www.analyticsvidhya.com/blog/2021/07/stock-market-forecasting-using-time-series-analysis-with-arima-model/. Acesso em: 15, agosto de 2023.
 
-    2. ORDORICA, David. Forecasting Time Series with Auto-Arima. All Data Science, 2021. Disponível em: https://www.alldatascience.com/time-series/forecasting-time-series-with-auto-arima/. Acessado em: 10, agosto de 2023.
+    2. ORDORICA, David. Forecasting Time Series with Auto-Arima. All Data Science, 2021. Disponível em: https://www.alldatascience.com/time-series/forecasting-time-series-with-auto-arima/. Acessado em: 15, agosto de 2023.
 
-    3. SMITH, Taylor G. Forecasting the stock market with pmdarima. alkaline-ml, 2019. Disponível em: https://alkaline-ml.com/2019-12-18-pmdarima-1-5-2/. Acessado em: 10, agosto de 2023.
+    3. SMITH, Taylor G. Forecasting the stock market with pmdarima. alkaline-ml, 2019. Disponível em: https://alkaline-ml.com/2019-12-18-pmdarima-1-5-2/. Acessado em: 15, agosto de 2023.
 
-    4. Índice Bovespa (Ibovespa B3). B3, 2023. Disponível em: https://www.b3.com.br/pt_br/market-data-e-indices/indices/indices-amplos/ibovespa.htm. Acessado em: 10, agosto de 2023.
+    4. Índice Bovespa (Ibovespa B3). B3, 2023. Disponível em: https://www.b3.com.br/pt_br/market-data-e-indices/indices/indices-amplos/ibovespa.htm. Acessado em: 15, agosto de 2023.
 
-    5. Dados Históricos - Ibovespa. Investing.com, 2023. Disponível em: https://br.investing.com/indices/bovespa-historical-data. Acessado em: Acessado em: 10, agosto de 2023.
+    5. Dados Históricos - Ibovespa. Investing.com, 2023. Disponível em: https://br.investing.com/indices/bovespa-historical-data. Acessado em: Acessado em: 15, agosto de 2023.
     '''
 
