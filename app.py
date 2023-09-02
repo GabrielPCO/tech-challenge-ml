@@ -493,8 +493,191 @@ with tab3:
 
     ## ARIMA
 
-    Em Construção...
+    Lidar com séries temporais é um problema muito comum e que pode ser especialmente desafiador quando trata-se de uma variável com comportamento tão caótico como o IBOVESPA.
+
+    Diferente de variáveis naturais como a temperatura ou pluviometria, foi possível perceber durante a análise exploratória que o mercado de ações é bastante imprevisível,
+    pois é diretamente afetada por eventos e crises mundiais também muito difíceis de prever.
+
+    Portanto, provavelmente trata-se de uma série temporal não estacionária e sem sazonalidade, algo que dificulta a qualidade de métodos de previsão
+    de séries temporais como o Naive e o SeasonalNaive.
+
+    Para confirmar a não estacionariedade do índice IBOVESPA, será realizado o teste de Augmented Dickey-Fuller (ADF).
+
+    ## Teste ADF: série temporal original
+
+    ```python
+    print('Teste ADF')
+
+    print(f'Teste estatístico: {result_adfuller[0]}')
+    print(f'P-value: {result_adfuller[1]}')
+
+    print('Valores críticos:')
+    for key,value in result_adfuller[4].items():
+        print(f'{key}: {value}')
+    ```
+    ```
+    Teste ADF
+    Teste estatístico: -0.9930767867580185
+    P-value: 0.7557810012330982
+
+
+    Valores críticos:
+    1%: -3.4316669649844727
+    5%: -2.8621219552891963
+    10%: -2.5670797756478825
+    ```
+    
+    Foi obtido um p-valor de 0.756, muito maior que o valor crítico para um intervalo de confiança de 5%, ou seja, trata-se de uma série
+    não estacionária.
+
+    Uma das formas de atingir a estacionariedade de uma série temporal é aplicando a diferenciação dos dados.
     '''
+    st.divider()
+    '''
+    ## Série temporal diferenciada
+
+    '''
+    graf_serie_diff = load_img('Assets/Graficos/serie_diff.png')
+    st.image(graf_serie_diff)
+    '''
+    Claramente a série obtida a partir da diferenciação dos dados originais tem resultado muito mais constante e aparentemente possui
+    possui caráter estacionário
+
+    Para confirmar esta suposição, novamente o teste ADF foi aplicado, agora na série diferenciada
+
+    ## Teste ADF: série temporal diferenciada
+    ```python
+    result_adfuller = adfuller(dados_diff_original.y)
+
+    print('Teste ADF')
+
+    print(f'Teste estatístico: {result_adfuller[0]}')
+    print(f'P-value: {result_adfuller[1]}')
+
+    print('Valores críticos:')
+    for key,value in result_adfuller[4].items():
+        print(f'{key}: {value}')
+
+    if(result_adfuller[1] < result_adfuller[4]['5%']):
+        print('H0 nula confirmada, não é estacionária')
+    else:
+        print('H1 alternativa confirmada, é estacionária')
+    ```
+
+    ```
+    Teste ADF
+    Teste estatístico: -18.812636962257542
+    P-value: 2.0223875287149013e-30
+
+
+    Valores críticos:
+    1%: -3.4316669649844727
+    5%: -2.8621219552891963
+    10%: -2.5670797756478825
+    H1 alternativa confirmada, é estacionária
+    ```
+    '''
+    st.divider()
+    """
+    ## ACF e PACF
+
+    Com a séries temporal estacionáriaa obtidaa a partir da diferenciação da série original, podem ser calculados os valores de ACF (Autocorrelation Function) e PACF (Partial Autocorrelation Function).
+
+    Esta análise traz importantes resultados sobre a sazonalidade e a randomicidade da série temporal, bem como indica o grau de correlação entre os próprios intervalos de tempo existentes na série temporal.
+
+    """
+    graf_acf_pacf = load_img('Assets/Graficos/acf_pacf.png')
+    st.image(graf_acf_pacf)
+
+    graf_acf_lag5 = load_img('Assets/Graficos/acf_lag_5.png')
+    st.image(graf_acf_lag5)
+    '''
+    Com os gráficos, confirma-se a existência de autocorrelação na série temporal, especialmente com lags pequenos, ou seja, em um intervalo de dias reduzido.
+
+    É perceptível uma forte autocorrelação na série temporal do IBOVESPA em intervalos de 5 dias (lag = 5), ou seja, analisando um período de 5 dias geralmente serão observados valores do índice muito semelhantes.
+    '''
+    st.divider()
+    '''
+    ## Datasets de treino e teste
+
+    Para iniciar a criação de modelos para prever o comportamente do índice IBOVESPA, inicialmente foram separados os datasets de treino e teste.
+
+    Como treino, serão usados os dados até final de 2021 e como teste os dados de 2022 em diante.
+
+    ```python
+    train_set_date_col = dados_date_col.loc[dados_date_col.ds < '2022-01-01']
+    test_set_date_col = dados_date_col.loc[dados_date_col.ds >= '2022-01-01']
+    train_set_date_index = dados_date_index.loc[dados_date_index.index < '2022-01-01']
+    test_set_date_index = dados_date_index.loc[dados_date_index.index >= '2022-01-01']
+
+
+    print(len(train_set_date_col))
+    print(len(test_set_date_col))
+    ```
+
+    ```
+    4380
+    601
+    ```
+    '''
+    st.divider()
+    """
+    ## Modelos Naive
+
+    Modelos NAIVE são relativamente simples e geralmente são usados como primeira alternativa, para se ter uma ideia de baseline de desempenho para os próximos modelos explorados.
+
+    Serão utilizados os seguintes modelos:
+    - Naive
+    - SeasonalNaive
+    - WindowAverage
+    - SeasonalWindowAverage
+
+    Com os parâmetros abaixo:
+    - h = 601 (período previsto em dias)
+    - season_length = 7 (período considerado para cálculos de média móvel)
+    - window_size = 3 (número de seasons utilizadas na média móvel sazonal)
+    """
+    graf_naive = load_img('Assets/Graficos/modelos_naive.png')
+    st.image(graf_naive)
+    """
+    ```python
+    wmape_ = calc_wmape(forecast_df.y.values, forecast_df[f'{model_}'].values)
+    rmse_ = sqrt(mean_squared_error(forecast_df.y.values, forecast_df[f'{model_}'].values))
+    mae_ = calc_mae(forecast_df.y.values, forecast_df[f'{model_}'].values)
+
+    print(f'{model_} WMAPE: {wmape_:.2%}')
+    print(f'{model_} Test RMSE: %.2f' % rmse_)
+    print(f'{model_} MAE: %.2f' % mae_)
+    ```
+
+    ```
+    Naive WMAPE: 6.11%
+    Naive Test RMSE: 7.99
+    Naive MAE: 6.73
+
+
+    SeasonalNaive WMAPE: 6.10%
+    SeasonalNaive Test RMSE: 7.99
+    SeasonalNaive MAE: 6.72
+
+
+    WindowAverage WMAPE: 6.10%
+    WindowAverage Test RMSE: 7.98
+    WindowAverage MAE: 6.72
+
+
+    SeasWA WMAPE: 5.54%
+    SeasWA Test RMSE: 7.26
+    SeasWA MAE: 6.10
+    ```
+
+    Como esperado, os diferentes modelos Naive não atenderam à demanda do problema que lida com uma série temporal muito caótica, sem sazonalidade ou padrão algum.
+
+    Por esse motivo, mesmo os erros terem sido relativamente baixos, claramente as curvas previstas não condizem com a realidade do índice IBOVESPA, os modelos tiveram desempenho muito abaixo do ideal.
+
+    Em seguida, serão testados modelos mais complexos, como o ARIMA.
+    """
+
 with tab4:
     '''
 
