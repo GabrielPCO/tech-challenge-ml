@@ -55,8 +55,8 @@ def load_img(img):
 tab0, tab1, tab2, tab3, tab4, tab5 = st.tabs(["🔷Introdução",
                                               "🌐Base de Dados",
                                               "🔍Análise Exploratória dos Dados",
-                                              "📝Modelo", 
-                                              "📈Previsão",
+                                              "📋ARIMA",
+                                              "📈XGB", 
                                               "📑Referências"])
 
 # Separando as Tabs
@@ -98,7 +98,7 @@ with tab0:
     
     Neste documento iremos analizar dados históricos do fechamento do índice Ibovespa e criar um modelo preditivo com precisão adequada (acima de 70%) com intuito de evidenciar padrões e tendências futuras.
 
-    Os tópicos foram divididos em quatro categorias: base de dados, visualização dos dados, modelo e previsão. Cada categoria será tratada e mais aprofundada em sua respectiva aba dentro desse documento.
+    Os tópicos foram divididos em quatro categorias principais: base de dados, análise exploratória dos dados, ARIMA, XGB. Cada categoria será tratada e mais aprofundada em sua respectiva aba dentro desse documento.
 
     
     A seguir, disponibilizamos os dados utilizados para a análise no momento da publicação deste documento.
@@ -323,72 +323,27 @@ with tab1:
     st.divider()
     '''
 
-    ## Indexação
+    ## Finalização
 
-    Indexamos nossos dados pela coluna 'Data' e os ajustamos em ordem ascendente, assim poderemos trabalhar com nossos dados com maior facilidade.
+    Por fim, indexamos nossos dados pela coluna 'Data' em ordem ascendente e salvamos as modificações do DataFrame para o uso em nosso projeto.
     ```python
     # indexando o DataFrame pela data
     df_ibovespa_indexData = df_ibovespa.set_index(['Data'])
 
     # Ajustando o DataFrame para os dados ficarem em ordem ascendente quanto a data
     df_ibovespa_indexData = df_ibovespa_indexData.sort_index()
-    ```
-    O próximo passo é criar nossas colunas de target para o modelo.
-    '''
-    st.divider()
-    '''
 
-    ## Target
-
-    Para criar nossa coluna target, primeiramente iremos criar uma coluna chamada "Amanhã" com os dados de fechamente do dia seguinte ao fechamento de cada linha do nosso DataFrame.
-
-    Desse modo poderemos verificar se o dia seguinte ao fechamento atual apresenta um valor mais alto ou mais baixo.
-    ```python
-    # Criando a coluna "Amanhã" que tem o valor do fechamento do mercado do próximo dia em relação ao fechamento da linha atual
-    df_ibovespa_indexData["Amanhã"] = df_ibovespa_indexData["Último"].shift(-1)
-    df_ibovespa_indexData = df_ibovespa_indexData.dropna()
-
-    # Transformando a coluna "Amanhã" em inteiro
-    df_ibovespa_indexData["Amanhã"] = df_ibovespa_indexData["Amanhã"].astype(int)
-    ```
-    Em seguida, criaremos a coluna "Target" que indica: 
-    
-    0 -> se o fechamento futuro é menor que o atual
-
-    1 -> se o fechamento futuro é maior que o atual
-    ```python
-    # Criando a coluna "Target" que contem a informação se o mercado subiu ou caiu, 0 e 1 respectivamente
-    df_ibovespa_indexData["Target"] = (df_ibovespa_indexData["Amanhã"] > df_ibovespa_indexData["Último"]).astype(int)
-    df_ibovespa_indexData.head()
-    ```
-    ```
-    |            | Último | Abertura | Máxima | Mínima |      Vol. | Amanhã | Target |
-    |       Data |        |          |        |        |           |        |        |
-    | 2003-10-15 |	17942 |    18176 |  18313 |  17819 | 616250000 |  17955 |      1 |
-    | 2003-10-16 |	17955 |	   17944 |  18075 |  17834 | 280560000 |  17791 |      0 |
-    | 2003-10-17 |	17791 |	   17923 |  17946 |  17679 | 205450000 |  18370 |      1 |
-    | 2003-10-20 |	18370 |	   17791 |  18399 |  17770 | 361630000 |  18449 |      1 |
-    | 2003-10-21 |	18449 |	   18370 |  18660 |  18370 | 378080000 |  18235 |      0 |
-    ```
-    '''
-    st.divider()
-    '''
-
-    ## Finalização
-
-    Por fim, salvamos as modificações do DataFrame para o uso em nosso projeto.
-    ```python
     # Salvando o DataFrame
     df_ibovespa_indexData.to_csv('Assets/DataFrames/ibov_modelo.csv')
     ```
-    Agora nossos dados estão prontos para a próxima etapa de visualização.
+    Agora nossos dados estão prontos para a próxima etapa de análise.
 
-    Na visualização, poderemos analizar melhor as tendências e padrões de nossos dados
+    Na análise, poderemos visualizar melhor as tendências e padrões de nossos dados.
     '''
 with tab2:
     '''
 
-    ## Análise Exploratória dos Dados
+    ## Análise exploratória dos dados
 
     Inicialmente iremos visualizar o fechamento diário do Ibovespa no período entre 15/10/2003 a 15/08/2023
     '''
@@ -508,7 +463,7 @@ with tab2:
     st.divider()
     '''
     
-    ## Média Móvel & Desvio Padrão
+    ## Média móvel & desvio padrão
 
     Em seguida, traçamos as retas da média móvel e do desvio padrão para entender melhor o comportamento da nossa série.
     A média móvel é um estimador calculado a partir de amostras sequenciais, podendo indicar tendências em um determinado período.
@@ -519,56 +474,84 @@ with tab2:
     '''
 
     Pelo gráfico, observamos uma certa tendência de ascensão dos pontos de fechamento ao longo do histórico dos dados.
-    Para determinarmos com maior certeza essa hipótese, usaremos a seguir o teste Dickey-Fuller aumentado (ADF) para verificar se a série é ou não estacionária.
+
+    A seguir, iniciaremos a construção dos nossos modelos.
+    Utilizaremos dois métodos diferentes para uma melhor análise do fechamento do Ibovespa, visto que é um tipo de dado sensível, volátil e sem a presença de sazonalidade.
+    Inicialmente, vamos fazer a análise utilizando o algoritmo ARIMA retroalimentado. 
+    Em seguida, realizaremos uma outra análise aplicando o Extreme Gradient Boosting Regressor em nossos dados.
+    '''
+with tab3:
+    '''
+
+    ## ARIMA
+
+    Em Construção...
+    '''
+with tab4:
+    '''
+
+    ## Modelo XGBRegressor
+
+    Decidimos utilizar também o método **Extreme Gradient Boosting Regressor** para o nosso modelo de previsões.
+
+    Esse método em questão compõe um conjunto de classes de algoritmos de aprendizado de máquina que podem ser usados para problemas de classificação ou modelagem preditiva de regressão.
+
+    Os conjuntos são construídos a partir de modelos de árvore de decisão. As árvores são adicionadas uma de cada vez ao conjunto e ajustadas para corrigir os erros de previsão cometidos pelos modelos anteriores. Este é um tipo de modelo de aprendizado de máquina conjunto conhecido como boosting.
+
+    Os modelos são ajustados usando qualquer função de perda diferenciável arbitrária e algoritmo de otimização de gradiente descendente. Isso dá à técnica o nome de “aumento de gradiente” (Gradient boosting), pois o gradiente de perda é minimizado à medida que o modelo se ajusta, como uma rede neural.
+
+    Por esse motivo, o método se torna resistente ao "overfitting" (sobreajuste), ou seja, quando um modelo estatístico se ajusta muito bem ao conjunto de dados anteriormente observado.
+
+    Desse modo, julgamos o método como sendo de extrema utilidade para a previsão de dados sensíveis como os financeiros.
     '''
     st.divider()
     '''
     
-    ## Separando Treino e Teste
+    ## Separando treino e teste
 
-    Agora vamos desenvolver um modelo de previsão e treiná-lo. Então, vamos visualizar os dados dividindo-os em conjuntos de treinamento e teste.
+    Agora vamos desenvolver um modelo de previsão e treiná-lo. Para isso, vamos visualizar os dados dividindo-os em conjuntos de treinamento e teste.
     
-    Por se tratar de dados sensíveis e de maior volatilidade, decidimos dividir treinamento e teste em aproximadamente 90% e 10% dos dados, respectivamente.
-    
-    Selecionando um período de aproximadamente 7 meses de dados para o teste.
+    Por se tratar de dados sensíveis e de maior volatilidade, decidimos dividir treinamento e teste em aproximadamente 85% e 15% dos dados, respectivamente.
     ```python
-    treino = df_ibovespa_indexData.iloc[:-150]
-    teste = df_ibovespa_indexData.iloc[-150:]
+    treino = df_ibovespa_indexData.iloc[:int(.85*len(df_ibovespa_indexData)), :]
+    teste = df_ibovespa_indexData.iloc[int(.85*len(df_ibovespa_indexData)):, :]
     ```
     '''
     graf_5 = load_img('Assets/Graficos/treino_teste.jpg')
     st.image(graf_5)
     '''
-    
-    A seguir, iniciaremos a construção do nosso modelo utilizando o método Random Forest Classifier com os dados de treino selecionados.
-    '''
-with tab3:
-    '''
 
-    ## Modelo
-
-    Decidimos utilizar o método Random Forest Classifier para o nosso modelo de previsões.
-
-    Esse é o método de aprendizado conjunto para classificação, regressão e outras tarefas que opera construindo uma infinidade de árvores de decisão no momento do treinamento.
-
-    Por esse motivo, o método se torna resistente ao "overfitting" (sobreajuste), ou seja, quando um modelo estatístico se ajusta muito bem ao conjunto de dados anteriormente observado.
-
-    Desse modo, julgamos o método como sendo de extrema utilidade para a previsão de dados sensíveis como os financeiros.
+    Inicialmente, selecionamos as características e o target para o nosso modelo
     ```python
-    # Criando nosso modelo utilizando o método Random Forest Classifier
-    from sklearn.ensemble import RandomForestClassifier
+    # Definindo as variáveis de características e target do modelo
+    caracteristicas = ["Abertura","Máxima","Mínima","Vol."]
+    target = 'Último'
+    ```
 
-    modelo = RandomForestClassifier(n_estimators=40, min_samples_split=250, random_state=1)
-
-    preditores = ["Último","Vol.","Abertura","Máxima","Mínima","Amanhã"]
-    modelo.fit(treino[preditores], treino["Target"])
+    Em seguida, criamos nosso modelo de regressão
+    ```python
+    # Criando e treinando o modelo
+    modelo = xgb.XGBRegressor()
+    modelo.fit(treino[caracteristicas], treino[target])
     ```
     ```
-    |                            RandomForestClassifier                              |
-    | RandomForestClassifier(min_samples_split=250, n_estimators=40, random_state=1) |
+
+    |                                 XGBRegressor                                |
+    |XGBRegressor(base_score=None, booster=None, callbacks=None,                  |
+    |            colsample_bylevel=None, colsample_bynode=None,                   |
+    |            colsample_bytree=None, early_stopping_rounds=None,               |
+    |            enable_categorical=False, eval_metric=None, feature_types=None,  |
+    |            gamma=None, gpu_id=None, grow_policy=None, importance_type=None, |
+    |            interaction_constraints=None, learning_rate=None, max_bin=None,  |
+    |            max_cat_threshold=None, max_cat_to_onehot=None,                  |
+    |            max_delta_step=None, max_depth=None, max_leaves=None,            |
+    |            min_child_weight=None, missing=nan, monotone_constraints=None,   |
+    |            n_estimators=100, n_jobs=None, num_parallel_tree=None,           |
+    |            predictor=None, random_state=None, ...)                          |
+    
     ```
     '''
-with tab4:
+    st.divider()
     '''
 
     ## Previsão
@@ -576,46 +559,72 @@ with tab4:
     Após o ajuste dos dados, iremos realizar a previsão do fechamento do Ibovespa utilizando o modelo que criamos.
     Utilizaremos a função 'predict' para a previsão dos dados.
     ```python
-    # Fazendo a previsão com os dados ajustados
-    previsoes = modelo.predict(teste[preditores])
-
-    # Transformando as previsões em séries
-    previsoes = pd.Series(previsoes, index=teste.index)
+    # Criando e mostrando a previsão nos dados de teste
+    previsoes = modelo.predict(teste[caracteristicas])
+    print('Previsões do modelo:')
+    print(previsoes)
+    ```
+    ```
+    Previsões do modelo:
+    [101723.625  99988.08  101242.07  102306.07  100162.05   99860.3
+    100003.68  101212.35   99553.875  99227.74   99597.98  100655.06
+    100655.06   99391.75   99090.125  96282.25   97211.03   96396.99
+    97164.875  96320.805  95931.52   94704.586  95143.375  94796.336
+    94435.83   95248.26   96616.125  95628.12   96905.66   98047.18
+    98579.79   99160.62   99147.95   99173.93   99241.91   99760.98
+    100809.01  101833.55  101419.4   101454.92  101185.57   95993.21
+    94211.61   93897.37   95401.7    97421.086 100054.984 100759.914
+    102089.37  104115.61  105074.734 102198.45  104267.44  105048.1
+    106887.33  106963.914 106414.35  106297.53  107070.07  108213.17
+    111577.58  111736.6   111792.47  110379.016 111262.78  111814.625
+    111518.39  113224.95  114118.43  114273.195 112681.02  113579.89
+    115199.22  116040.56  116099.04  116099.82  119113.28  119247.695
+    115439.47  117023.43  117231.625 119247.695 118407.3   118407.3
+    118322.836 118110.74  118426.15  118426.15  118469.28  118407.3
+    118407.3   118376.945 118407.3   118407.3   118407.3   118407.3
+    118407.3   118407.3   116744.625 118521.41  115075.02  118918.5
+    116835.55  116217.1   119266.55  119247.695 118407.3   118407.3
+    118407.3   118407.3   118407.3   119086.88  118407.3   118407.3
+    118335.125 118376.945 113315.69  112869.195 115358.1   112862.305
+    110065.58  111281.44  107258.14  107449.805 111984.055 112843.414
+    111547.08  111193.82  110223.86  113579.89  114218.875 114458.12
+    114218.875 115184.54  114402.98  115373.07  114706.17  115278.805
+    114118.43  112091.92  114576.41  115174.29  116143.78  116358.836
+    ...
+    118407.3   117368.91  118374.266 117214.14  117264.33  119484.984
+    118376.945 118513.766 118407.3   118335.125 118407.3   118376.945
+    118376.945 118376.945 118433.76  118459.54  118407.3   118376.945
+    118511.78  119266.55  119132.13  117451.43  116468.82 ]
     ```
 
-    Em seguida, vamos verificar o 'score' do nosso modelo utilizando o 'precision_score' do sklearn.
+    Em seguida, vamos verificar a acurácia do nosso modelo.
     ```python
-    # Testando a precisão do nosso modelo
-    precision_score(teste["Target"],previsoes)
+    # Mostrando a acurácia do modelo
+    acuracia = modelo.score(teste[caracteristicas], teste[target])
+    print('Acurácia:')
+    print(acuracia)
     ```
     ```
-    0.7078651685393258
+    Acurácia:
+    0.8809057960319034
     ```
-    Com um Score de aproximadamente 0,7078651685393258 o modelo tem aproximadamente 70% de acurácia para prever as próximas observações de fechamento do mercado.
+    Com um score de 0,8809057960319034 o modelo tem aproximadamente 88% de acurácia para prever as próximas observações de fechamento do mercado.
     '''
     st.divider()
     '''
-    Vamos então, plotar o gráfico das previsões e dos valores originais observados nos dados para um melhor entendimento do nosso resultado.
+    Vamos então, plotar o gráfico das previsões, dos valores de treino e de teste para um melhor entendimento do nosso resultado.
     ```python
-    # Concatenando dados de previsão e target
-    combinado = pd.concat([teste["Target"], previsoes], axis=1)
-
-    # Criando o gráfico de avaliação da nossa previsão
+    # Plotando as previsões e o preço no fechamento
     plt.figure(figsize=(10,6))
+    plt.plot(treino['Último'], color='green', label='Treino')
+    plt.plot(teste['Último'], color = 'blue', label='Teste')
+    plt.plot(teste[target].index, previsoes, color = 'orange',label='Previsão')
+    plt.title('Previsão do modelo')
     plt.xlabel('Data')
-    plt.ylabel('Target')
-    plt.title('Previsão x Target')
-    line1, = plt.plot(combinado["Target"])
-    line2, = plt.plot(combinado[0])
-    plt.yticks(range(0,2))
-    line1.set_label('Original')
-    line2.set_label('Previsão')
+    plt.ylabel('Preço no fechamento')
     plt.legend()
     plt.grid()
-    plt.tight_layout()
-    plt.savefig('Assets/Graficos/previsao_target.jpg')
     plt.show()
-    ```
     '''
     graf_6 = load_img('Assets/Graficos/previsao_target.jpg')
     st.image(graf_6)
@@ -624,7 +633,7 @@ with tab4:
 
     ## Conclusão:
 
-    Após organizar, modificar e ajustar os dados através do modelo de previsão Random Forest Classifier, fomos capazes de prever os dados de teste com uma acurácia adequada (acima de 70%).
+    Após organizar, modificar e ajustar os dados através do modelo de previsão Extreme Gradient Boosting Regressor, fomos capazes de prever os dados de teste com uma acurácia adequada (acima de 70%).
     
     Provavelmente, o modelo em questão seria capaz de prever alguma das próximas observações mantendo uma boa precisão em relação aos dados futuros.
     '''
@@ -648,5 +657,7 @@ with tab5:
     7. Sobreajuste. In: WIKIPÉDIA: a enciclopédia livre. [São Francisco, CA: Fundação Wikimedia], 2023. Disponível em: https://pt.wikipedia.org/wiki/Sobreajuste. Acessado em: 15, agosto de 2023.
 
     8. PARUCHURI, Vik. Predict The Stock Market With Machine Learning And Python. YouTube, 2022. Disponível em: https://www.youtube.com/watch?v=1O_BenficgE. Acessado em: 15, agosto de 2023.
+
+    9. BROWNLEE, Jason. XGBoost for Regression, 2021. Disponível em: https://machinelearningmastery.com/xgboost-for-regression/. Acessado em: 15, agosto de 2023.
     '''
 
