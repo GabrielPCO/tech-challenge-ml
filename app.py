@@ -54,7 +54,7 @@ def load_img(img):
 # Layout do aplicativo
 tab0, tab1, tab2, tab3, tab4, tab5 = st.tabs(["🔷Introdução",
                                               "🌐Base de Dados",
-                                              "🔍Visualização dos Dados",
+                                              "🔍Análise Exploratória dos Dados",
                                               "📝Modelo", 
                                               "📈Previsão",
                                               "📑Referências"])
@@ -388,7 +388,7 @@ with tab1:
 with tab2:
     '''
 
-    ## Visualização dos Dados
+    ## Análise Exploratória dos Dados
 
     Inicialmente iremos visualizar o fechamento diário do Ibovespa no período entre 15/10/2003 a 15/08/2023
     '''
@@ -396,7 +396,14 @@ with tab2:
     st.image(graf_1)
     '''
 
-    Em um primeiro momento, parece que o gráfico apresenta uma tendencia de subida ao longo dos anos.
+    Analisando a série temporal do valor de fechamento diário do IBOVESPA, de maneira geral ficam evidentes seis momentos distintos, marcados por alguns grandes eventos socioeconômicos:
+
+    1. Tendência de aumento do índice entre 2004 e 2008
+    2. Crise econômica de 2008, com recuperação em meados de 2010
+    3. Tendência de queda de 2010 a 2016
+    4. Alta tendência de subida entre 2016 e 2020
+    5. Queda abrupta com a pandemia em 2020
+    6. Retomada da normalidade a partir do final de 2021, com série variando em momentos de queda e alta
 
     Também podemos notar que a maioria dos dados se concentra na região entre os 40.000 a 80.000 pontos, porém precisamos de mais análises gráficas para poder confirmar essa nossa hipótese.
     '''
@@ -432,6 +439,19 @@ with tab2:
 
     https://www.cnnbrasil.com.br/economia/numero-de-investidores-na-bolsa-cresce-15-em-2022-apostando-na-diversificacao/
     '''
+
+    '''
+    ## Volume x Fechamento
+
+    Possivelmente, os valores de fechamento do índice IBOVESPA e volume total negociado no mercado estão positivamente correlacionados,
+    tendo em vista que com ações mais valorizadas há mais chance de ocorrorem negociações de compra e venda de ações.
+    '''
+    graf_vol_fechamento = load_img('Assets/Graficos/volume_fechamento.png')
+    st.image(graf_vol_fechamento)
+    '''
+    Neste gráfico de dispersão é possível visualizar uma forte correlação entre o valor do índice IBOVESPA e o volume negociado em bolsa. 
+    Para estas duas variáveis, foi calculada uma correlação de aproximadaente 0.70, um valor bastante alto e que confirma a hipótese incial.
+    '''
     st.divider()
     '''
     ## Diferença entre mínimo e máximo
@@ -453,7 +473,23 @@ with tab2:
     ```    
     Este resultado reforça o comportamento atípico do IBOVESPA a partir de 2020, por conta do contexto da pandemia e aquecimento do mercado de renda variável. 
     
-    Possivelmente, 2021 e 2022 aparecem em seguida no rankin também por reflexo dos efeitos da crise causada pela pandemia.
+    Possivelmente, 2021 e 2022 aparecem em seguida no ranking também por reflexo dos efeitos da crise causada pela pandemia.
+    '''
+    st.divider()
+    '''
+    ## Componentes da série temporal original
+
+    Para entender mais a fundo comportamento da variável target (Fechamento) ao longo do tempo, é uma opção visualizar os diferentes componentes da série temporal
+
+    '''
+    graf_serie_componentes = load_img('Assets/Graficos/serie_temporal_componentes.png')
+    st.image(graf_serie_componentes)
+    '''
+    Não foi possível extrair insights muito valiosos com a decomposição da série temporal em seus componentes. A tendência representa a mesma curva da própria série porém um pouco mais suavizada.
+
+    A sazonalidade têm padrão caótico, indicando que não é sazonalidade aparente nos dados, o que faz bastante sentido se tratando do mercado de ações.
+
+    Já o resíduo reforça a ideia de 2020 ser um ano fora do padrão de comportamento da curva.
     '''
     st.divider()
     '''
