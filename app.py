@@ -1,6 +1,7 @@
 # Libs
 
 import pandas as pd
+import datetime as dt
 
 # libs gráficas
 import matplotlib.pyplot as plt
@@ -51,13 +52,12 @@ def load_img(img):
     return plt.imread(img)
 
 # Layout do aplicativo
-tab0, tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["🔷Introdução",
-                                                    "🌐Base de Dados",
-                                                    "🔍Visualização",
-                                                    "📝ADF", 
-                                                    "📊ARIMA",
-                                                    "📈Previsão",
-                                                    "📑Referências"])
+tab0, tab1, tab2, tab3, tab4, tab5 = st.tabs(["🔷Introdução",
+                                              "🌐Base de Dados",
+                                              "🔍Visualização dos Dados",
+                                              "📝Modelo", 
+                                              "📈Previsão",
+                                              "📑Referências"])
 
 # Separando as Tabs
 with tab0:
@@ -96,9 +96,9 @@ with tab0:
     
     Composto pelas ações e units de companhias listadas na B3 que atendem aos critérios descritos na sua metodologia, correspondendo a cerca de 80% do número de negócios e do volume financeiro do nosso mercado de capitais.
     
-    Neste documento iremos analizar dados históricos do fechamento do índice Ibovespa e criar um modelo preditivo com intuito de evidenciar padrões e tendências futuras dentro de um intervalo apropriado de confiança.
+    Neste documento iremos analizar dados históricos do fechamento do índice Ibovespa e criar um modelo preditivo com precisão adequada (acima de 70%) com intuito de evidenciar padrões e tendências futuras.
 
-    Os tópicos foram divididos em cinco categorias: base de dados, visualização, ADF, ARIMA e previsão. Cada categoria será tratada e mais aprofundada em sua respectiva aba dentro desse documento.
+    Os tópicos foram divididos em quatro categorias: base de dados, visualização dos dados, modelo e previsão. Cada categoria será tratada e mais aprofundada em sua respectiva aba dentro desse documento.
 
     
     A seguir, disponibilizamos os dados utilizados para a análise no momento da publicação deste documento.
@@ -188,7 +188,16 @@ with tab1:
     |       Data | Último | Abertura | Máxima | Mínima | Vol. |   Var% |
     | 10.02.2016 | 40.377 |   40.592 | 40.592 |  39.96 |  NaN | -0,53% |
     ```
-    Decidimos não alterar o valor NaN nessa ocasião, pois essa alteração não afetará nossa previsão, pois utilizaremos apenas os dados de fechamento de mercado no estudo.
+    Decidimos então remover a linha, pois o valor nulo contido na coluna "Vol." impedirá a construção adequada do nosso modelo de previsão.
+    ```python
+    # Removendo a linha com valor nulo
+    df_ibovespa = df_ibovespa.drop(df_ibovespa[df_ibovespa['Vol.'].isna()].index)
+    ```
+    Removemos também a coluna "Var%", pois essa coluna não será interessante para nosso modelo de previsões.
+    ```python
+    # Removendo coluna Var%
+    del df_ibovespa['Var%']
+    ```
     '''
     st.divider()
     '''
@@ -216,7 +225,7 @@ with tab1:
     df_ibovespa.shape
     ```
     ```
-    (4912, 7)
+    (4911, 6)
     ```
     E as principais informações dos nossos dados
     ```python
@@ -225,19 +234,18 @@ with tab1:
     ```
     ```
     <class 'pandas.core.frame.DataFrame'>
-    RangeIndex: 4912 entries, 0 to 4911
-    Data columns (total 7 columns):
+    Index: 4911 entries, 0 to 4911
+    Data columns (total 6 columns):
     #   Column    Non-Null Count  Dtype  
     ---  ------    --------------  -----  
-    0   Data      4912 non-null   object 
-    1   Último    4912 non-null   float64
-    2   Abertura  4912 non-null   float64
-    3   Máxima    4912 non-null   float64
-    4   Mínima    4912 non-null   float64
+    0   Data      4911 non-null   object 
+    1   Último    4911 non-null   float64
+    2   Abertura  4911 non-null   float64
+    3   Máxima    4911 non-null   float64
+    4   Mínima    4911 non-null   float64
     5   Vol.      4911 non-null   object 
-    6   Var%      4912 non-null   object 
-    dtypes: float64(4), object(3)
-    memory usage: 268.8+ KB
+    dtypes: float64(4), object(2)
+    memory usage: 268.6+ KB
     ```
     '''
     st.divider()
@@ -254,12 +262,12 @@ with tab1:
     df_ibovespa.head()
     ```
     ```
-    |       Data |  Último | Abertura |  Máxima |  Mínima |   Vol. |   Var% |
-    | 2023-08-15 | 116.552 | 116.809  | 117.697 | 116.238 | 11,79M | -0,22% |
-    | 2023-08-14 | 116.810 | 118.067  | 118.082 | 116.530 | 11,20M | -1,06% |
-    | 2023-08-11 | 118.065 | 118.350  | 119.054 | 117.415 | 11,87M | -0,24% |
-    | 2023-08-10 | 118.350 | 118.412  | 119.438 | 118.113 | 12,69M | -0,05% |
-    | 2023-08-09 | 118.409 | 119.090  | 119.090 | 117.901 | 11,25M | -0,57% |
+    |       Data |  Último | Abertura |  Máxima |  Mínima |   Vol. |
+    | 2023-08-15 | 116.552 |  116.809 | 117.697 | 116.238 | 11,79M |
+    | 2023-08-14 | 116.810 |  118.067 | 118.082 | 116.530 | 11,20M |
+    | 2023-08-11 | 118.065 |  118.350 | 119.054 | 117.415 | 11,87M |
+    | 2023-08-10 | 118.350 |  118.412 | 119.438 | 118.113 | 12,69M |
+    | 2023-08-09 | 118.409 |  119.090 | 119.090 | 117.901 | 11,25M |
     ```
     '''
     st.divider()
@@ -283,12 +291,84 @@ with tab1:
     df_ibovespa.head()
     ```
     ```
-    |       Data | Último | Abertura | Máxima | Mínima |   Vol. |   Var% |
-    | 2023-08-15 | 116552 | 116809   | 117697 | 116238 | 11,79M | -0,22% |
-    | 2023-08-14 | 116810 | 118067   | 118082 | 116530 | 11,20M | -1,06% |
-    | 2023-08-11 | 118065 | 118350   | 119054 | 117415 | 11,87M | -0,24% |
-    | 2023-08-10 | 118350 | 118412   | 119438 | 118113 | 12,69M | -0,05% |
-    | 2023-08-09 | 118409 | 119090   | 119090 | 117901 | 11,25M | -0,57% |
+    |       Data | Último | Abertura | Máxima | Mínima |   Vol. |
+    | 2023-08-15 | 116552 |   116809 | 117697 | 116238 | 11,79M |
+    | 2023-08-14 | 116810 |   118067 | 118082 | 116530 | 11,20M |
+    | 2023-08-11 | 118065 |   118350 | 119054 | 117415 | 11,87M |
+    | 2023-08-10 | 118350 |   118412 | 119438 | 118113 | 12,69M |
+    | 2023-08-09 | 118409 |   119090 | 119090 | 117901 | 11,25M |
+    ```
+    '''
+    st.divider()
+    '''
+
+    ## Conversão dos Valores de Volume
+    Observamos que o Dtype da coluna "Vol." estão como 'object'.
+
+    Como os dados representam volumes em milhões (M) ou milhares (K) de reais, teremos que fazer a conversão dos dados.
+    ```python
+    # Transformando a coluna Vol. em numérica
+    df_ibovespa["Vol."] = df_ibovespa["Vol."].replace({",":".","K":"*1e3", "M":"*1e6"}, regex=True).map(pd.eval).astype(int)
+    df_ibovespa.head()
+    ```
+    ```
+    |       Data | Último | Abertura | Máxima | Mínima |     Vol. |
+    | 2023-08-15 | 116552 |   116809 | 117697 | 116238 | 11790000 |
+    | 2023-08-14 | 116810 |   118067 | 118082 | 116530 | 11200000 |
+    | 2023-08-11 | 118065 |   118350 | 119054 | 117415 | 11870000 |
+    | 2023-08-10 | 118350 |   118412 | 119438 | 118113 | 12690000 |
+    | 2023-08-09 | 118409 |   119090 | 119090 | 117901 | 11250000 |
+    ```
+    '''
+    st.divider()
+    '''
+
+    ## Indexação
+
+    Indexamos nossos dados pela coluna 'Data' e os ajustamos em ordem ascendente, assim poderemos trabalhar com nossos dados com maior facilidade.
+    ```python
+    # indexando o DataFrame pela data
+    df_ibovespa_indexData = df_ibovespa.set_index(['Data'])
+
+    # Ajustando o DataFrame para os dados ficarem em ordem ascendente quanto a data
+    df_ibovespa_indexData = df_ibovespa_indexData.sort_index()
+    ```
+    O próximo passo é criar nossas colunas de target para o modelo.
+    '''
+    st.divider()
+    '''
+
+    ## Target
+
+    Para criar nossa coluna target, primeiramente iremos criar uma coluna chamada "Amanhã" com os dados de fechamente do dia seguinte ao fechamento de cada linha do nosso DataFrame.
+
+    Desse modo poderemos verificar se o dia seguinte ao fechamento atual apresenta um valor mais alto ou mais baixo.
+    ```python
+    # Criando a coluna "Amanhã" que tem o valor do fechamento do mercado do próximo dia em relação ao fechamento da linha atual
+    df_ibovespa_indexData["Amanhã"] = df_ibovespa_indexData["Último"].shift(-1)
+    df_ibovespa_indexData = df_ibovespa_indexData.dropna()
+
+    # Transformando a coluna "Amanhã" em inteiro
+    df_ibovespa_indexData["Amanhã"] = df_ibovespa_indexData["Amanhã"].astype(int)
+    ```
+    Em seguida, criaremos a coluna "Target" que indica: 
+    
+    0 -> se o fechamento futuro é menor que o atual
+
+    1 -> se o fechamento futuro é maior que o atual
+    ```python
+    # Criando a coluna "Target" que contem a informação se o mercado subiu ou caiu, 0 e 1 respectivamente
+    df_ibovespa_indexData["Target"] = (df_ibovespa_indexData["Amanhã"] > df_ibovespa_indexData["Último"]).astype(int)
+    df_ibovespa_indexData.head()
+    ```
+    ```
+    |            | Último | Abertura | Máxima | Mínima |      Vol. | Amanhã | Target |
+    |       Data |        |          |        |        |           |        |        |
+    | 2003-10-15 |	17942 |    18176 |  18313 |  17819 | 616250000 |  17955 |      1 |
+    | 2003-10-16 |	17955 |	   17944 |  18075 |  17834 | 280560000 |  17791 |      0 |
+    | 2003-10-17 |	17791 |	   17923 |  17946 |  17679 | 205450000 |  18370 |      1 |
+    | 2003-10-20 |	18370 |	   17791 |  18399 |  17770 | 361630000 |  18449 |      1 |
+    | 2003-10-21 |	18449 |	   18370 |  18660 |  18370 | 378080000 |  18235 |      0 |
     ```
     '''
     st.divider()
@@ -296,19 +376,15 @@ with tab1:
 
     ## Finalização
 
-    Por fim, indexamos nossos dados pela coluna 'Data' e salvamos as modificações para o uso em nosso projeto.
+    Por fim, salvamos as modificações do DataFrame para o uso em nosso projeto.
     ```python
-    # indexando o DataFrame pela data
-    df_ibovespa_indexData = df_ibovespa.set_index(['Data'])
-
     # Salvando o DataFrame
-    df_ibovespa_indexData.to_csv('Assets/DataFrames/ibov.csv')
+    df_ibovespa_indexData.to_csv('Assets/DataFrames/ibov_modelo.csv')
     ```
     Agora nossos dados estão prontos para a próxima etapa de visualização.
 
     Na visualização, poderemos analizar melhor as tendências e padrões de nossos dados
     '''
-
 with tab2:
     '''
 
@@ -369,233 +445,114 @@ with tab2:
     Pelo gráfico, observamos uma certa tendência de ascensão dos pontos de fechamento ao longo do histórico dos dados.
     Para determinarmos com maior certeza essa hipótese, usaremos a seguir o teste Dickey-Fuller aumentado (ADF) para verificar se a série é ou não estacionária.
     '''
-with tab3:
-    '''
-
-    ## Teste Dickey-Fuller Aumentado (ADF)
-
-    Utilizaremos o teste dickey-fuller aumentado em nossa serie temporal, pois ele é um dos testes mais comumente utilizados na estatistica para determinar a estacionaridade em séries complexas.
-    
-    Traremos as seguintes hipóteses para sobre a nossa série:
-
-    ```
-    Hipótese nula - A série tem uma raíz unitária
-
-    Hipótese Alternativa - A série não tem uma raíz unitária
-    ```
-
-    Se a hipótese nula não for rejeitada, a série será considerada não-estacionária.
-    A série se torna estacionária caso a média e o desvio padrão forem linhas retas (média constante e variância constante)
-    '''
-    st.divider()
-    '''
-
-    ## Aplicando o Teste
-
-    Realizamos então o teste para análise dos resultados
-
-    ```python
-    # Performando teste aumentado de Dickey-Fuller para verificar se a nossa série temporal (df_ibovespa_indexData_log) é estacionária
-    print('Resultados do teste Dickey Fuller:')
-    dftest = adfuller(df_ibovespa_indexData_log, autolag='AIC')
-
-    dfoutput = pd.Series(dftest[0:4], index=['Estatística de Teste', 'p-valor', 'Lags utilizados', 'Número de observações utilizadas'])
-    for key, value in dftest[4].items():
-        dfoutput['Valor crítico (%s)'%key] = value
-
-    print(dfoutput)
-    ```
-    ```
-    Resultados do teste Dickey Fuller:
-    Estatística de Teste                  -0.178197
-    p-valor                                0.941071
-    Lags utilizados                        6.000000
-    Número de observações utilizadas    4905.000000
-    Valor crítico (1%)                    -3.431684
-    Valor crítico (5%)                    -2.862129
-    Valor crítico (10%)                   -2.567084
-    dtype: float64
-    ```
-
-    Pelos resultados do teste de Dickey-Fuller não podemos rejeitar a hipótese nula, pois o p-valor é maior que 0.05.
-
-    Além disso, a estatística de teste excede os valores críticos. Sendo assim, os dados são considerados não lineares.
-    '''
-    st.divider()
-    '''
-    
-    ## Isolando Sazonalidade e Tendência
-
-    A sazonalidade e a tendência precisam ser separadas de nossa série antes que possamos realizar uma análise mais aprofundada.
-    '''
-    graf_5 = load_img('Assets/Graficos/seasonal.jpg')
-    st.image(graf_5)
-    st.divider()
-    '''
-    
-    ## Reduzindo a Magnitude
-
-    Para reduzir a magnitude dos valores e a tendência crescente da série, primeiro fazemos um logaritmo da série. Em seguida, calculamos a média móvel da série após obter o logaritmo da série.
-    '''
-    graf_6 = load_img('Assets/Graficos/mm_std_log.jpg')
-    st.image(graf_6)
     st.divider()
     '''
     
     ## Separando Treino e Teste
 
-    Agora vamos desenvolver um modelo ARIMA e treiná-lo usando o preço de fechamento da ação a partir dos dados do treino. Então, vamos visualizar os dados dividindo-os em conjuntos de treinamento e teste.
+    Agora vamos desenvolver um modelo de previsão e treiná-lo. Então, vamos visualizar os dados dividindo-os em conjuntos de treinamento e teste.
     
-    Decidimos dividir treinamento e teste em 80% e 20% dos dados, respectivamente.
+    Por se tratar de dados sensíveis e de maior volatilidade, decidimos dividir treinamento e teste em aproximadamente 90% e 10% dos dados, respectivamente.
+    
+    Selecionando um período de aproximadamente 7 meses de dados para o teste.
     ```python
-    train_len = int(df_ibovespa_indexData_log.shape[0]*0.8)
-    train_data, test_data = train_test_split(df_ibovespa_indexData_log.sort_index(),train_size=train_len)
+    treino = df_ibovespa_indexData.iloc[:-150]
+    teste = df_ibovespa_indexData.iloc[-150:]
     ```
     '''
-    graf_7 = load_img('Assets/Graficos/treino_teste.jpg')
-    st.image(graf_7)
+    graf_5 = load_img('Assets/Graficos/treino_teste.jpg')
+    st.image(graf_5)
     '''
     
-    A seguir, iniciaremos a construção do nosso modelo ARIMA com os dados de treino selecionados.
+    A seguir, iniciaremos a construção do nosso modelo utilizando o método Random Forest Classifier com os dados de treino selecionados.
+    '''
+with tab3:
+    '''
+
+    ## Modelo
+
+    Decidimos utilizar o método Random Forest Classifier para o nosso modelo de previsões.
+
+    Esse é o método de aprendizado conjunto para classificação, regressão e outras tarefas que opera construindo uma infinidade de árvores de decisão no momento do treinamento.
+
+    Por esse motivo, o método se torna resistente ao "overfitting" (sobreajuste), ou seja, quando um modelo estatístico se ajusta muito bem ao conjunto de dados anteriormente observado.
+
+    Desse modo, julgamos o método como sendo de extrema utilidade para a previsão de dados sensíveis como os financeiros.
+    ```python
+    # Criando nosso modelo utilizando o método Random Forest Classifier
+    from sklearn.ensemble import RandomForestClassifier
+
+    modelo = RandomForestClassifier(n_estimators=40, min_samples_split=250, random_state=1)
+
+    preditores = ["Último","Vol.","Abertura","Máxima","Mínima","Amanhã"]
+    modelo.fit(treino[preditores], treino["Target"])
+    ```
+    ```
+    |                            RandomForestClassifier                              |
+    | RandomForestClassifier(min_samples_split=250, n_estimators=40, random_state=1) |
+    ```
     '''
 with tab4:
     '''
 
-    ## Modelo ARIMA
-
-    Decidimos utilizar a função Auto ARIMA para podermos testar e descobrir a ordem mais otimizada para o Modelo ARIMA.
-
-    Ela retorna um modelo ARIMA ajustado após determinar os parâmetros mais ideais de p, q e d.
-
-    ```python
-        arima_fit = auto_arima(train_data.sort_index(), start_p=0, start_q=0,
-                        test='adf',       # usa o teste adf para achar o 'd' otimizado
-                        max_p=5, max_q=5, # máximo p e q
-                        m=1,              # frequência da série
-                        d=None,           # deixa o modelo decidir o 'd'
-                        seasonal=False,   # Sem sazonalidade
-                        start_P=0, 
-                        D=0, 
-                        trace=True,
-                        error_action='ignore',  
-                        suppress_warnings=True, 
-                        stepwise=True)
-    print(arima_fit.summary())
-    arima_fit.plot_diagnostics(figsize=(15,8))
-    plt.show()
-    ```
-    ```
-    Performing stepwise search to minimize aic
-    ARIMA(0,1,0)(0,0,0)[0] intercept   : AIC=-20868.132, Time=0.14 sec
-    ARIMA(1,1,0)(0,0,0)[0] intercept   : AIC=-20866.387, Time=0.16 sec
-    ARIMA(0,1,1)(0,0,0)[0] intercept   : AIC=-20866.399, Time=0.32 sec
-    ARIMA(0,1,0)(0,0,0)[0]             : AIC=-20867.508, Time=0.08 sec
-    ARIMA(1,1,1)(0,0,0)[0] intercept   : AIC=-20864.132, Time=0.39 sec
-
-    Best model:  ARIMA(0,1,0)(0,0,0)[0] intercept
-    Total fit time: 1.094 seconds
-                                SARIMAX Results                                
-    ==============================================================================
-    Dep. Variable:                      y   No. Observations:                 3929
-    Model:               SARIMAX(0, 1, 0)   Log Likelihood               10436.066
-    Date:                Tue, 15 Aug 2023   AIC                         -20868.132
-    Time:                        16:51:36   BIC                         -20855.581
-    Sample:                             0   HQIC                        -20863.679
-                                - 3929                                         
-    Covariance Type:                  opg                                         
-    ==============================================================================
-                    coef    std err          z      P>|z|      [0.025      0.975]
-    ------------------------------------------------------------------------------
-    intercept      0.0004      0.000      1.620      0.105   -9.22e-05       0.001
-    sigma2         0.0003   3.46e-06     83.415      0.000       0.000       0.000
-    ===================================================================================
-    Ljung-Box (L1) (Q):                   0.25   Jarque-Bera (JB):              4246.78
-    ...
-    ===================================================================================
-    ```
-    '''
-    graf_8 = load_img('Assets/Graficos/auto_arima.jpg')
-    st.image(graf_8)
-    st.divider()
-    '''
-
-    ## Resultados
-
-    Observamos que como resultado o modelo Auto ARIMA atribuiu os valores 0, 1 e 0 para p, d e q, respectivamente.
-
-    A seguir iremos utilizar o modelo para a previsão dos valores de fechamento do Ibovespa.
-    '''
-with tab5:
-    '''
-
     ## Previsão
 
-    Após o ajuste dos dados, iremos realizar a previsão dos valores de fechamento do Ibovespa utilizando o modelo que criamos.
-    Utilizaremos a função 'predict' do statsmodel para a previsão dos dados.
+    Após o ajuste dos dados, iremos realizar a previsão do fechamento do Ibovespa utilizando o modelo que criamos.
+    Utilizaremos a função 'predict' para a previsão dos dados.
     ```python
     # Fazendo a previsão com os dados ajustados
-    prediction, confint = arima_fit.predict(len(test_data), return_conf_int=True,alpha=0.05)
+    previsoes = modelo.predict(teste[preditores])
+
+    # Transformando as previsões em séries
+    previsoes = pd.Series(previsoes, index=teste.index)
     ```
 
-    Em seguida, vamos plotar o gráfico com a previsão e os intervalos de confiança.
+    Em seguida, vamos verificar o 'score' do nosso modelo utilizando o 'precision_score' do sklearn.
     ```python
-    # Previsão
-    # Transformando em Series Pandas
-    fc_series = pd.Series(prediction.values, index=test_data.sort_index().index)
-    lower_series = pd.Series(confint[:, 0], index=test_data.sort_index().index)
-    upper_series = pd.Series(confint[:, 1], index=test_data.sort_index().index)
+    # Testando a precisão do nosso modelo
+    precision_score(teste["Target"],previsoes)
+    ```
+    ```
+    0.7078651685393258
+    ```
+    Com um Score de aproximadamente 0,7078651685393258 o modelo tem aproximadamente 70% de acurácia para prever as próximas observações de fechamento do mercado.
+    '''
+    st.divider()
+    '''
+    Vamos então, plotar o gráfico das previsões e dos valores originais observados nos dados para um melhor entendimento do nosso resultado.
+    ```python
+    # Concatenando dados de previsão e target
+    combinado = pd.concat([teste["Target"], previsoes], axis=1)
 
-    # Plotando
-    plt.figure(figsize=(10,5), dpi=100)
-    plt.plot(train_data, label='Treino')
-    plt.plot(test_data, color = 'blue', label='Original')
-    plt.plot(fc_series, color = 'orange',label='Previsão')
-    plt.fill_between(lower_series.index, lower_series, upper_series, 
-                    color='k', alpha=.15)
-    plt.title('Previsão do Fechamento do Ibovespa')
+    # Criando o gráfico de avaliação da nossa previsão
+    plt.figure(figsize=(10,6))
     plt.xlabel('Data')
-    plt.ylabel('Fechamento')
-    plt.legend(loc='upper left', fontsize=8)
+    plt.ylabel('Target')
+    plt.title('Previsão x Target')
+    line1, = plt.plot(combinado["Target"])
+    line2, = plt.plot(combinado[0])
+    plt.yticks(range(0,2))
+    line1.set_label('Original')
+    line2.set_label('Previsão')
+    plt.legend()
     plt.grid()
+    plt.tight_layout()
+    plt.savefig('Assets/Graficos/previsao_target.jpg')
     plt.show()
     ```
     '''
-    graf_9 = load_img('Assets/Graficos/previsao.jpg')
-    st.image(graf_9)
-    st.divider()
-    '''
-
-    ## Relatório de Performance
-
-    ```python
-    # Relatório de performance
-    mse = mean_squared_error(test_data.values, prediction.values)
-    print('MSE: '+str(mse))
-    mae = mean_absolute_error(test_data.values, prediction.values)
-    print('MAE: '+str(mae))
-    rmse = math.sqrt(mean_squared_error(test_data.values, prediction.values))
-    print('RMSE: '+str(rmse))
-    mape = np.mean(np.abs(prediction.values - test_data.values)/np.abs(test_data.values))
-    print('MAPE: '+str(mape))
-    ```
-    ```
-    MSE: 0.040290750459765705
-    MAE: 0.16540199812023165
-    RMSE: 0.20072556005592737
-    MAPE: 0.014319964423499875
-    ```
-    Com um MAPE de aproximadamente 1,4% o modelo tem 98,6% de acurácia para prever as próximas observações dentro do intervalo de confiânça
-    '''
+    graf_6 = load_img('Assets/Graficos/previsao_target.jpg')
+    st.image(graf_6)
     st.divider()
     '''
 
     ## Conclusão:
 
-    Após organizar, modificar e ajustar os dados de fechamento através do modelo de previsão ARIMA, fomos capazes de prever os dados de teste com uma alta taxa de confiança.
+    Após organizar, modificar e ajustar os dados através do modelo de previsão Random Forest Classifier, fomos capazes de prever os dados de teste com uma acurácia adequada (acima de 70%).
     
-    Provavelmente, o modelo em questão seria capaz de prever alguma das próximas observações com acurácia, dentro dos limites de confiânça.
+    Provavelmente, o modelo em questão seria capaz de prever alguma das próximas observações mantendo uma boa precisão em relação aos dados futuros.
     '''
-with tab6:
+with tab5:
     '''
 
     ## Referências
@@ -608,6 +565,12 @@ with tab6:
 
     4. Índice Bovespa (Ibovespa B3). B3, 2023. Disponível em: https://www.b3.com.br/pt_br/market-data-e-indices/indices/indices-amplos/ibovespa.htm. Acessado em: 15, agosto de 2023.
 
-    5. Dados Históricos - Ibovespa. Investing.com, 2023. Disponível em: https://br.investing.com/indices/bovespa-historical-data. Acessado em: Acessado em: 15, agosto de 2023.
+    5. Dados Históricos - Ibovespa. Investing.com, 2023. Disponível em: https://br.investing.com/indices/bovespa-historical-data. Acessado em: 15, agosto de 2023.
+
+    6. Random forest. In: WIKIPÉDIA: a enciclopédia livre. [São Francisco, CA: Fundação Wikimedia], 2023. Disponível em: https://en.wikipedia.org/wiki/Random_forest. Acessado em: 15, agosto de 2023.
+
+    7. Sobreajuste. In: WIKIPÉDIA: a enciclopédia livre. [São Francisco, CA: Fundação Wikimedia], 2023. Disponível em: https://pt.wikipedia.org/wiki/Sobreajuste. Acessado em: 15, agosto de 2023.
+
+    8. PARUCHURI, Vik. Predict The Stock Market With Machine Learning And Python. YouTube, 2022. Disponível em: https://www.youtube.com/watch?v=1O_BenficgE. Acessado em: 15, agosto de 2023.
     '''
 
