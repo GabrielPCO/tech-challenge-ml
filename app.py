@@ -474,10 +474,18 @@ with tab2:
     '''
 
     Pelo gráfico, observamos uma certa tendência de ascensão dos pontos de fechamento ao longo do histórico dos dados.
+    '''
+    st.divider()
+    '''
+
+    ## Próximos passos
 
     A seguir, iniciaremos a construção dos nossos modelos.
+
     Utilizaremos dois métodos diferentes para uma melhor análise do fechamento do Ibovespa, visto que é um tipo de dado sensível, volátil e sem a presença de sazonalidade.
+    
     Inicialmente, vamos fazer a análise utilizando o algoritmo ARIMA retroalimentado. 
+    
     Em seguida, realizaremos uma outra análise aplicando o Extreme Gradient Boosting Regressor em nossos dados.
     '''
 with tab3:
