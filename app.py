@@ -417,6 +417,46 @@ with tab2:
     '''
     st.divider()
     '''
+    
+    ## Volume negociado
+
+    Além do valor de fechamento, analisar variáveis como o Volume negociado pode ser interessante para entendermos o contexto do mercado financeiro brasileiro.
+
+    '''
+    graf_volume = load_img('Assets/Graficos/volume1.png')
+    st.image(graf_volume)
+    '''
+    O gráfico ilustra bem a evolução do mercado variável no Brasil. É visível que, até meados de 2019, o volume de negociações sofreu pouca alteração com uma leve tendência de crescimento.
+
+    Com a redução nas taxas de juros e Selic, e consequentemente a baixa nos investimentos de Renda Fixa, o mercado de Renda Variável teve um "boom" a partir do ano de 2020.
+
+    https://www.cnnbrasil.com.br/economia/numero-de-investidores-na-bolsa-cresce-15-em-2022-apostando-na-diversificacao/
+    '''
+    st.divider()
+    '''
+    ## Diferença entre mínimo e máximo
+
+    Uma maneira interessante de verificar comportamentos incomuns nesta série temporal é identificar os dias com maior diferença entre os valores diários mínimos e máximos
+    '''
+    graf_dif_min_max = load_img('Assets/Graficos/dif_min_max1.png')
+    st.image(graf_dif_min_max)
+    '''
+    **Número de dias com diferença entre mínimo e máximo maior que 5 pontos:**
+
+    ```
+    |      |  N dias | 
+    |  Ano |         | 
+    | 2020 |    19   |
+    | 2021 |    3    |
+    | 2022 |    2    |
+    | 2018 |    2    |
+    ```    
+    Este resultado reforça o comportamento atípico do IBOVESPA a partir de 2020, por conta do contexto da pandemia e aquecimento do mercado de renda variável. 
+    
+    Possivelmente, 2021 e 2022 aparecem em seguida no rankin também por reflexo dos efeitos da crise causada pela pandemia.
+    '''
+    st.divider()
+    '''
 
     ## Transformação Logaritmica
 
