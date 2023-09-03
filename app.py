@@ -96,7 +96,7 @@ with tab0:
     
     Composto pelas ações e units de companhias listadas na B3 que atendem aos critérios descritos na sua metodologia, correspondendo a cerca de 80% do número de negócios e do volume financeiro do nosso mercado de capitais.
     
-    Neste documento iremos analizar dados históricos do fechamento do índice Ibovespa e criar um modelo preditivo com precisão adequada (acima de 70%) com intuito de evidenciar padrões e tendências futuras.
+    Neste documento iremos analisar dados históricos do fechamento do índice Ibovespa e criar um modelo preditivo com precisão adequada (acima de 70%) com intuito de evidenciar padrões e tendências futuras.
 
     Os tópicos foram divididos em quatro categorias principais: base de dados, análise exploratória dos dados, ARIMA, XGB. Cada categoria será tratada e mais aprofundada em sua respectiva aba dentro desse documento.
 
@@ -150,7 +150,7 @@ with tab1:
 
     Inicialmente, realizamos o carregamento dos dados utilizados na análise.
 
-    Esses dados contem o histórico de fechamento do índice Ibovespa durante o período de 15/10/2003 a 15/08/2023.
+    Esses dados contém o histórico de fechamento do índice Ibovespa durante o período de 15/10/2003 a 15/08/2023.
 
     Os dados foram obtidos do site da investing.com que é uma plataforma e site de notícias sobre o mercado financeiro.
     ```python
@@ -275,9 +275,9 @@ with tab1:
 
     ## Conversão Inteiros
 
-    Observamos que o Dtype das colunas numericas estão como 'float64'.
+    Observamos que o Dtype das colunas numéricas estão como 'float64'.
 
-    Como os dados representam pontos de merdado e devem ser um número inteiro, temos que fazer a conversão.
+    Como os dados representam pontos de mercado e devem ser um número inteiro, temos que fazer a conversão.
     ```python
     # Transformando as colunas que estão como float para int
     df_ibovespa['Último'] = df_ibovespa['Último'] * 1000
@@ -394,18 +394,19 @@ with tab2:
 
     https://www.cnnbrasil.com.br/economia/numero-de-investidores-na-bolsa-cresce-15-em-2022-apostando-na-diversificacao/
     '''
-
+    st.divider()
     '''
+
     ## Volume x Fechamento
 
     Possivelmente, os valores de fechamento do índice IBOVESPA e volume total negociado no mercado estão positivamente correlacionados,
-    tendo em vista que com ações mais valorizadas há mais chance de ocorrorem negociações de compra e venda de ações.
+    tendo em vista que com ações mais valorizadas há mais chance de ocorrem negociações de compra e venda de ações.
     '''
     graf_vol_fechamento = load_img('Assets/Graficos/volume_fechamento.png')
     st.image(graf_vol_fechamento)
     '''
     Neste gráfico de dispersão é possível visualizar uma forte correlação entre o valor do índice IBOVESPA e o volume negociado em bolsa. 
-    Para estas duas variáveis, foi calculada uma correlação de aproximadaente 0.70, um valor bastante alto e que confirma a hipótese incial.
+    Para estas duas variáveis, foi calculada uma correlação de aproximadamente 0.70, um valor bastante alto e que confirma a hipótese inicial.
     '''
     st.divider()
     '''
@@ -440,18 +441,18 @@ with tab2:
     graf_serie_componentes = load_img('Assets/Graficos/serie_temporal_componentes.png')
     st.image(graf_serie_componentes)
     '''
-    Não foi possível extrair insights muito valiosos com a decomposição da série temporal em seus componentes. A tendência representa a mesma curva da própria série porém um pouco mais suavizada.
+    Não foi possível extrair insights muito valiosos com a decomposição da série temporal em seus componentes. A tendência representa a mesma curva da própria série, porém um pouco mais suavizada.
 
-    A sazonalidade têm padrão caótico, indicando que não é sazonalidade aparente nos dados, o que faz bastante sentido se tratando do mercado de ações.
+    A sazonalidade tem padrão caótico, indicando que não é sazonalidade aparente nos dados, o que faz bastante sentido se tratando do mercado de ações.
 
     Já o resíduo reforça a ideia de 2020 ser um ano fora do padrão de comportamento da curva.
     '''
     st.divider()
     '''
 
-    ## Transformação Logaritmica
+    ## Transformação Logarítmica
 
-    Para uma melhor visualização dos nossos dados, iremos realizar a transformação logaritmica da nossa série temporal.
+    Para uma melhor visualização dos nossos dados, iremos realizar a transformação logarítmica da nossa série temporal.
     ```python
     # Transformação logarítmica da série temporal
     df_ibovespa_indexData_log = np.log(df_ibovespa_indexData['Último'])
@@ -485,7 +486,7 @@ with tab2:
     Utilizaremos dois métodos diferentes para uma melhor análise do fechamento do Ibovespa, visto que é um tipo de dado sensível, volátil e sem a presença de sazonalidade.
     
     Inicialmente, vamos fazer a análise utilizando o algoritmo ARIMA retroalimentado. 
-    
+
     Em seguida, realizaremos uma outra análise aplicando o Extreme Gradient Boosting Regressor em nossos dados.
     '''
 with tab3:
@@ -501,7 +502,7 @@ with tab3:
     Portanto, provavelmente trata-se de uma série temporal não estacionária e sem sazonalidade, algo que dificulta a qualidade de métodos de previsão
     de séries temporais como o Naive e o SeasonalNaive.
 
-    Para confirmar a não estacionariedade do índice IBOVESPA, será realizado o teste de Augmented Dickey-Fuller (ADF).
+    Para confirmarmos essa hipótese, será realizado o teste de Augmented Dickey-Fuller (ADF).
 
     ## Teste ADF: série temporal original
 
@@ -530,7 +531,7 @@ with tab3:
     Foi obtido um p-valor de 0.756, muito maior que o valor crítico para um intervalo de confiança de 5%, ou seja, trata-se de uma série
     não estacionária.
 
-    Uma das formas de atingir a estacionariedade de uma série temporal é aplicando a diferenciação dos dados.
+    Uma das formas de transformar a nossa série temporal em estacionária é aplicando a diferenciação dos dados.
     '''
     st.divider()
     '''
@@ -541,7 +542,7 @@ with tab3:
     st.image(graf_serie_diff)
     '''
     Claramente a série obtida a partir da diferenciação dos dados originais tem resultado muito mais constante e aparentemente possui
-    possui caráter estacionário
+    caráter estacionário
 
     Para confirmar esta suposição, novamente o teste ADF foi aplicado, agora na série diferenciada
 
@@ -581,9 +582,9 @@ with tab3:
     """
     ## ACF e PACF
 
-    Com a séries temporal estacionáriaa obtidaa a partir da diferenciação da série original, podem ser calculados os valores de ACF (Autocorrelation Function) e PACF (Partial Autocorrelation Function).
+    Com a séries temporal estacionária obtida a partir da diferenciação da série original, podem ser calculados os valores de ACF (Autocorrelation Function) e PACF (Partial Autocorrelation Function).
 
-    Esta análise traz importantes resultados sobre a sazonalidade e a randomicidade da série temporal, bem como indica o grau de correlação entre os próprios intervalos de tempo existentes na série temporal.
+    Esta análise traz importantes resultados sobre a sazonalidade e a aleatoriedade da série temporal, bem como indica o grau de correlação entre os próprios intervalos de tempo existentes na série temporal.
 
     """
     graf_acf_pacf = load_img('Assets/Graficos/acf_pacf.png')
@@ -600,7 +601,7 @@ with tab3:
     '''
     ## Datasets de treino e teste
 
-    Para iniciar a criação de modelos para prever o comportamente do índice IBOVESPA, inicialmente foram separados os datasets de treino e teste.
+    Para iniciar a criação de modelos para prever o comportamento do índice IBOVESPA, inicialmente foram separados os datasets de treino e teste.
 
     Como treino, serão usados os dados até final de 2021 e como teste os dados de 2022 em diante.
 
@@ -621,7 +622,7 @@ with tab3:
     ```
     '''
     st.divider()
-    """
+    '''
     ## Modelos Naive
 
     Modelos NAIVE são relativamente simples e geralmente são usados como primeira alternativa, para se ter uma ideia de baseline de desempenho para os próximos modelos explorados.
@@ -636,10 +637,10 @@ with tab3:
     - h = 601 (período previsto em dias)
     - season_length = 7 (período considerado para cálculos de média móvel)
     - window_size = 3 (número de seasons utilizadas na média móvel sazonal)
-    """
+    '''
     graf_naive = load_img('Assets/Graficos/modelos_naive.png')
     st.image(graf_naive)
-    """
+    '''
     ```python
     wmape_ = calc_wmape(forecast_df.y.values, forecast_df[f'{model_}'].values)
     rmse_ = sqrt(mean_squared_error(forecast_df.y.values, forecast_df[f'{model_}'].values))
@@ -676,8 +677,7 @@ with tab3:
     Por esse motivo, mesmo os erros terem sido relativamente baixos, claramente as curvas previstas não condizem com a realidade do índice IBOVESPA, os modelos tiveram desempenho muito abaixo do ideal.
 
     Em seguida, serão testados modelos mais complexos, como o ARIMA.
-    """
-
+    '''
 with tab4:
     '''
 
@@ -689,9 +689,9 @@ with tab4:
 
     Os conjuntos são construídos a partir de modelos de árvore de decisão. As árvores são adicionadas uma de cada vez ao conjunto e ajustadas para corrigir os erros de previsão cometidos pelos modelos anteriores. Este é um tipo de modelo de aprendizado de máquina conjunto conhecido como boosting.
 
-    Os modelos são ajustados usando qualquer função de perda diferenciável arbitrária e algoritmo de otimização de gradiente descendente. Isso dá à técnica o nome de “aumento de gradiente” (Gradient boosting), pois o gradiente de perda é minimizado à medida que o modelo se ajusta, como uma rede neural.
+    Os modelos são ajustados usando qualquer função de perda diferençável arbitrária e algoritmo de otimização de gradiente descendente. Isso dá à técnica o nome de “aumento de gradiente” (Gradient boosting), pois o gradiente de perda é minimizado à medida que o modelo se ajusta, como uma rede neural.
 
-    Por esse motivo, o método se torna resistente ao "overfitting" (sobreajuste), ou seja, quando um modelo estatístico se ajusta muito bem ao conjunto de dados anteriormente observado.
+    Por esse motivo, o método se torna resistente ao "overfitting" (sobre ajuste), ou seja, quando um modelo estatístico se ajusta muito bem ao conjunto de dados anteriormente observado.
 
     Desse modo, julgamos o método como sendo de extrema utilidade para a previsão de dados sensíveis como os financeiros.
     '''
@@ -803,6 +803,9 @@ with tab4:
     '''
     st.divider()
     '''
+
+    ## Plotando o gráfico
+
     Vamos então, plotar o gráfico das previsões, dos valores de treino e de teste para um melhor entendimento do nosso resultado.
     ```python
     # Plotando as previsões e o preço no fechamento
