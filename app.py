@@ -345,7 +345,7 @@ with tab2:
 
     ## Análise exploratória dos dados
 
-    Inicialmente iremos visualizar o fechamento diário do Ibovespa no período entre 15/10/2003 a 15/08/2023
+    Inicialmente iremos visualizar o fechamento diário do Ibovespa no período entre 15/10/2003 e 15/08/2023
     '''
     graf_1 = load_img('Assets/Graficos/historico.jpg')
     st.image(graf_1)
@@ -678,12 +678,12 @@ with tab3:
     '''
     ## Modelo ARIMA padrão
 
-    O modelo Autoregressive Integrated Moving Average (ARIMA) é um dos algoritmos clássicos para previsões de séries temporais, que baseia-se na auto-regressão de períodos de tempo próximos, que são auto-correlacionados.
+    O modelo Autoregressive Integrated Moving Average (ARIMA) é um dos algoritmos clássicos para previsões de séries temporais, que baseia-se na autoregressão de períodos de tempo próximos, que são auto correlacionados.
 
     Três parâmetros são definidos em um modelo ARIMA:
-    - p: The number of lag observations included in the model, also called the lag order --> **5**
-    - d: The number of times that the raw observations are differenced, also called the degree of differencing --> **1**
-    - q: The size of the moving average window, also called the order of moving average --> **0**
+    - p: O número de observações de atraso (lags) incluídas no modelo, também chamado de ordem de atraso --> **5**
+    - d: O número de vezes que as observações brutas são diferenciadas, também chamado de grau de diferenciação --> **1**
+    - q: O tamanho da janela da média móvel, também chamada de ordem da média móvel --> **0**
 
     Utilizando estes parãmetros, foram obtidos os seguintes resultados:
     '''
@@ -762,7 +762,7 @@ with tab3:
 
     Agora, além de valores baixos de erro, foi alcançada uma curva prevista muito próxima da real.
 
-    Um ponto a se pensar é o real valor deste tipo de modelo, já que da maneira que foi construído prevê apenas um dia, um período de tempo muito curto apesar da sua boa assertividade.
+    Um ponto a se pensar é o real valor deste tipo de modelo, já que da maneira que foi construído prevê apenas um dia, um período muito curto apesar da sua boa assertividade.
 
     Vale ressaltar a dificuldade de prever séries temporais como a do índice IBOVESPA com base apenas no próprio comportamento da curva. 
     
