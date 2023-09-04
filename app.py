@@ -642,10 +642,6 @@ with tab3:
     st.image(graf_naive)
     '''
     ```python
-    wmape_ = calc_wmape(forecast_df.y.values, forecast_df[f'{model_}'].values)
-    rmse_ = sqrt(mean_squared_error(forecast_df.y.values, forecast_df[f'{model_}'].values))
-    mae_ = calc_mae(forecast_df.y.values, forecast_df[f'{model_}'].values)
-
     print(f'{model_} WMAPE: {wmape_:.2%}')
     print(f'{model_} Test RMSE: %.2f' % rmse_)
     print(f'{model_} MAE: %.2f' % mae_)
@@ -678,6 +674,101 @@ with tab3:
 
     Em seguida, serão testados modelos mais complexos, como o ARIMA.
     '''
+    st.divider()
+    '''
+    ## Modelo ARIMA padrão
+
+    O modelo Autoregressive Integrated Moving Average (ARIMA) é um dos algoritmos clássicos para previsões de séries temporais, que baseia-se na auto-regressão de períodos de tempo próximos, que são auto-correlacionados.
+
+    Três parâmetros são definidos em um modelo ARIMA:
+    - p: The number of lag observations included in the model, also called the lag order --> **5**
+    - d: The number of times that the raw observations are differenced, also called the degree of differencing --> **1**
+    - q: The size of the moving average window, also called the order of moving average --> **0**
+
+    Utilizando estes parãmetros, foram obtidos os seguintes resultados:
+    '''
+    graf_arima_padrao = load_img('Assets/Graficos/modelo_arima_padrao.png')
+    st.image(graf_arima_padrao)
+    '''
+    ```python
+    print(f'{model_} WMAPE: {wmape_:.2%}')
+    print(f'{model_} Test RMSE: %.2f' % rmse_)
+    print(f'{model_} MAE: %.2f' % mae_)
+    ```
+
+    ```
+    ARIMA padrão WMAPE: 6.12%
+    ARIMA padrão Test RMSE: 8.01
+    ARIMA padrão MAE: 6.74
+    ```
+
+    Novamente, apesar do valor baixo no WMAPE, analisando a curva é visível que o modelo está com qualidade ruim, pois foi prevista uma linha constante, muito distante do comportamento da série temporal que possui diversos altos e baixos.
+
+    Uma das hipóteses é que o modelo está utilizando o comportamento do dataset de treino para fazer todas as previsões do dataset de teste de uma única vez.
+    
+    Porém, no caso da série IBOVESPA, há uma grande imprevisibilidade associada, tratando-se de um caso de "Random Walk".     
+    Por este motivo, será construído um novo modelo, em que a cada nova previsão diária do dataset de teste, será treinado um novo modelo, agregando as informações do dia anterior.
+
+    Em resumo será feito um modelo com treino dinâmico, atualizando a cada nova previsão o conjunto de treino.
+    '''
+    st.divider()
+    '''
+    ## Modelo ARIMA dinâmico
+
+    O laço de repetição abaixo representa a lógica aplicada neste modelo ARIMA dinâmico
+
+    ```python
+    # Lista que receberá os valores previstos em cada repetição
+    y_pred_step = []
+
+    # Variável que armazena o dataset de treino e cada repetição é atualizada com um novo valor observado vindo do dataset de teste
+    history = train_set_date_index.copy()
+
+    for i in range(len(test_set_date_index)):
+        # Treinamento do modelo com a variável history
+        model_arima = ARIMA(history, order=(5,1,0))
+        model_arima_fit = model_arima.fit()
+
+        # Forecast de um único valor diário do IBVOESPA 
+        output = model_arima_fit.forecast(disp=0)
+        yhat = output[0]
+
+        # Adição do valor previsto à lista
+        y_pred_step.append(yhat)
+
+        # Valor observado no dataset de teste
+        obs = test_set_date_index.values[i]
+
+        # Atualização do dataset de treino com adição do valor observado
+        history = pd.concat([history, pd.DataFrame({'y':obs}, index=[test_set_date_index.index[i]])])
+    ```
+
+    A seguir, é possível visualizar a série original do conjunto de teste e a curva prevista utilizando o método ARIMA de maneira dinâmica.
+    '''
+    graf_arima_dinamico = load_img('Assets/Graficos/modelo_arima_dinamico.png')
+    st.image(graf_arima_dinamico)
+    '''
+    ```python
+    print(f'{model_} WMAPE: {wmape_:.2%}')
+    print(f'{model_} Test RMSE: %.2f' % rmse_)
+    print(f'{model_} MAE: %.2f' % mae_)
+    ```
+
+    ```
+    ARIMA dinâmico WMAPE: 0.70%
+    ARIMA dinâmico Test RMSE: 1.15
+    ARIMA dinâmico MAE: 0.77
+    ```
+
+    Agora, além de valores baixos de erro, foi alcançada uma curva prevista muito próxima da real.
+
+    Um ponto a se pensar é o real valor deste tipo de modelo, já que da maneira que foi construído prevê apenas um dia, um período de tempo muito curto apesar da sua boa assertividade.
+
+    Vale ressaltar a dificuldade de prever séries temporais como a do índice IBOVESPA com base apenas no próprio comportamento da curva. 
+    
+    Talvez a maneira ideal de atacar esse problema seria a combinação de métodos de previsão de séries temporais e modelos de regressão tradicionais, utilizando variáveis econômicas, socais e políticas para ajustar a curva prevista.
+    '''
+
 with tab4:
     '''
 
